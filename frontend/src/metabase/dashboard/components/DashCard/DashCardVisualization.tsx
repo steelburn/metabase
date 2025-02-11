@@ -14,7 +14,7 @@ import { useSelector } from "metabase/lib/redux";
 import { isJWT } from "metabase/lib/utils";
 import { isUuid } from "metabase/lib/uuid";
 import { getMetadata } from "metabase/selectors/metadata";
-import type { IconName, IconProps } from "metabase/ui";
+import { Flex, type IconName, type IconProps, Title } from "metabase/ui";
 import { getVisualizationRaw } from "metabase/visualizations";
 import type { Mode } from "metabase/visualizations/click-actions/Mode";
 import Visualization from "metabase/visualizations/components/Visualization";
@@ -31,10 +31,7 @@ import type {
 } from "metabase-types/api";
 
 import { ClickBehaviorSidebarOverlay } from "./ClickBehaviorSidebarOverlay/ClickBehaviorSidebarOverlay";
-import {
-  VirtualDashCardOverlayRoot,
-  VirtualDashCardOverlayText,
-} from "./DashCard.styled";
+import S from "./DashCard.module.css";
 import { DashCardMenu } from "./DashCardMenu/DashCardMenu";
 import { DashCardParameterMapper } from "./DashCardParameterMapper/DashCardParameterMapper";
 import type {
@@ -160,11 +157,11 @@ export function DashCardVisualization({
           t`This card does not support click mappings`;
 
         return (
-          <VirtualDashCardOverlayRoot>
-            <VirtualDashCardOverlayText>
+          <Flex align="center" justify="center" h="100%">
+            <Title order={4} p="md" className={S.VirtualDashCardOverlayText}>
               {placeholderText}
-            </VirtualDashCardOverlayText>
-          </VirtualDashCardOverlayRoot>
+            </Title>
+          </Flex>
         );
       }
       return (

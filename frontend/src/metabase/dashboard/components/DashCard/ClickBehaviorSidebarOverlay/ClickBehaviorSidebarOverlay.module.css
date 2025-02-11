@@ -1,0 +1,37 @@
+.HelperText {
+  display: block;
+}
+
+.Button {
+  display: flex;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: var(--mb-color-bg-light);
+  color: var(--mb-color-text-medium);
+
+  &.isActive {
+    background-color: var(--mb-color-brand);
+    color: var(--mb-color-text-white);
+  }
+}
+
+.ClickIcon {
+  margin-right: 0.5rem;
+  color: var("--mb-color-text-light");
+
+  &.isActive {
+    color: unset;
+  }
+}
+
+.ClickBehaviorDescription {
+  display: block;
+  color: var(--mb-color-brand);
+
+  &.isActive {
+    color: unset;
+  }
+}

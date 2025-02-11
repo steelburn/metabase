@@ -11,8 +11,9 @@ import DashboardS from "metabase/css/dashboard.module.css";
 import { isEmbeddingSdk } from "metabase/env";
 import ParametersS from "metabase/parameters/components/ParameterValueWidget.module.css";
 import { FullWidthContainer } from "metabase/styled-components/layout/FullWidthContainer";
-import { breakpointMaxSmall, space } from "metabase/styled-components/theme";
-import { SAVING_DOM_IMAGE_CLASS } from "metabase/visualizations/lib/save-chart-image";
+import { Box, type BoxProps } from "metabase/ui";
+
+import S from "./Dashboard.module.css";
 
 interface DashboardLoadingAndErrorWrapperProps
   extends LoadingAndErrorWrapperProps {
@@ -113,8 +114,8 @@ export const ParametersWidgetContainer = styled(FullWidthContainer)<{
   isSticky: boolean;
   isNightMode: boolean;
 }>`
-  padding-top: ${space(1)};
-  padding-bottom: ${space(1)};
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
   /* z-index should be higher than in dashcards */
   z-index: 3;
   top: 0;
@@ -170,31 +171,16 @@ export const ParametersAndCardsContainer = styled.div<{
 `;
 
 export const FIXED_WIDTH = "1048px";
-export const FixedWidthContainer = styled.div<{
-  isFixedWidth: boolean;
-}>`
-  width: 100%;
+export const FixedWidthContainer = (props: BoxProps) => {
+  const { className, ...rest } = props;
+  return <Box className={cx(S.FixedWidthContainer, className)} {...rest} />;
+};
 
-  ${({ isFixedWidth }) =>
-    isFixedWidth &&
-    css`
-      margin: 0 auto;
-      max-width: ${FIXED_WIDTH};
-    `}
-
-  .${SAVING_DOM_IMAGE_CLASS} & {
-    legend {
-      top: -9px;
-    }
-  }
-`;
-
-export const ParametersFixedWidthContainer = styled(FixedWidthContainer)`
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-
-  ${breakpointMaxSmall} {
-    flex-direction: column;
-  }
-`;
+export const ParametersFixedWidthContainer = (props: BoxProps) => {
+  return (
+    <FixedWidthContainer
+      className={S.ParametersFixedWidthContainer}
+      {...props}
+    />
+  );
+};

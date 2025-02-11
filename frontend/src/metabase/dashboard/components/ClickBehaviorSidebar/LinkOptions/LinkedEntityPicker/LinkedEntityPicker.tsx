@@ -31,7 +31,7 @@ import type {
   EntityCustomDestinationClickBehavior,
 } from "metabase-types/api";
 
-import { Heading } from "../../ClickBehaviorSidebar.styled";
+import { Heading } from "../../ClickBehaviorSidebarComponents";
 import { SidebarItem } from "../../SidebarItem";
 import {
   LinkTargetEntityPickerContent,

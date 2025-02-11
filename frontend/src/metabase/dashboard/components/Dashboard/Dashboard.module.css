@@ -1,0 +1,26 @@
+.FixedWidthContainer {
+  width: 100%;
+
+  &.isFixedWidth {
+    margin: 0 auto;
+    /* FIXED_WIDTH */
+    max-width: 1048px;
+  }
+
+  /* SAVING_DOM_IMAGE_CLASS */
+  .saving-dom-image & {
+    legend {
+      top: -9px;
+    }
+  }
+}
+
+.ParametersFixedWidthContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+
+  @media screen and (max-width: 40em) {
+    flex-direction: column;
+  }
+}

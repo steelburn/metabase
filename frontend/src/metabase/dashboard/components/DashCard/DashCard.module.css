@@ -1,0 +1,33 @@
+.VirtualDashCardOverlayText {
+  color: var(--mb-color-text-medium);
+}
+
+.DashCardRoot {
+  background-color: var(--mb-color-bg-dashboard-card);
+  scroll-margin: 6px 0;
+
+  &.isNightMode {
+    border-color: var(--mb-color-bg-night);
+    background-color: var(--mb-color-bg-night);
+  }
+
+  &.hasHiddenBackground {
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  &.shouldForceHiddenBackground {
+    background: var(--mb-color-bg-light);
+    box-shadow: none !important;
+
+    &.isEmbeddingSdk {
+      background: var(--mb-color-bg-dashboard);
+    }
+  }
+
+  &.isUsuallySlow {
+    /* border-color: ${theme.fn.themeColor("accent4")}; */
+    border-color: var(--dashcard-slow-border-color);
+  }
+}

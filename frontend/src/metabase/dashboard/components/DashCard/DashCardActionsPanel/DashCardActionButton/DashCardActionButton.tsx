@@ -2,12 +2,11 @@ import type { ElementType, HTMLAttributes } from "react";
 import { forwardRef } from "react";
 
 import Tooltip from "metabase/core/components/Tooltip";
+import { Icon, type IconProps } from "metabase/ui";
 
-import {
-  ActionIcon,
-  HEADER_ICON_SIZE,
-  StyledAnchor,
-} from "./DashCardActionButton.styled";
+import { StyledAnchor } from "./DashCardActionButton.styled";
+
+export const HEADER_ICON_SIZE = 16;
 
 interface Props extends HTMLAttributes<HTMLAnchorElement> {
   as?: ElementType;
@@ -22,6 +21,10 @@ const DashActionButton = forwardRef<HTMLAnchorElement, Props>(
       </StyledAnchor>
     );
   },
+);
+
+const ActionIcon = (props: IconProps) => (
+  <Icon size={HEADER_ICON_SIZE} {...props} />
 );
 
 export const DashCardActionButton = Object.assign(DashActionButton, {

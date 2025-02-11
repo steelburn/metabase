@@ -34,8 +34,8 @@ import type {
 } from "metabase-types/api";
 import type { StoreDashcard } from "metabase-types/store";
 
-import { DashCardRoot } from "./DashCard.styled";
 import { DashCardActionsPanel } from "./DashCardActionsPanel/DashCardActionsPanel";
+import { DashCardRoot } from "./DashCardComponents";
 import { DashCardVisualization } from "./DashCardVisualization";
 import type {
   CardSlownessStatus,

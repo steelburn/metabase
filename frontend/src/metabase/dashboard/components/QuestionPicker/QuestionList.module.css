@@ -1,0 +1,5 @@
+.QuestionListItem {
+  .Icon:last-child {
+    justify-self: start;
+  }
+}
