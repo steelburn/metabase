@@ -99,6 +99,7 @@ export const QuestionList = memo(function QuestionList({
   return (
     <>
       <Flex align="center" className={S.SearchContainer}>
+        {/* TODO: replace with TextInput */}
         <SearchInput
           fullWidth
           value={searchText}

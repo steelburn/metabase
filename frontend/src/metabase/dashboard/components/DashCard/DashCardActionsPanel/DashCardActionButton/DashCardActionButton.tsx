@@ -1,10 +1,11 @@
+import cx from "classnames";
 import type { ElementType, HTMLAttributes } from "react";
 import { forwardRef } from "react";
 
 import Tooltip from "metabase/core/components/Tooltip";
 import { Icon, type IconProps } from "metabase/ui";
 
-import { StyledAnchor } from "./DashCardActionButton.styled";
+import S from "./DashCardActionButton.module.css";
 
 export const HEADER_ICON_SIZE = 16;
 
@@ -14,11 +15,18 @@ interface Props extends HTMLAttributes<HTMLAnchorElement> {
 }
 
 const DashActionButton = forwardRef<HTMLAnchorElement, Props>(
-  function DashActionButton({ as, tooltip, children, ...props }, ref) {
+  function DashActionButton(
+    { as: Component = "a", tooltip, children, ...props },
+    ref,
+  ) {
     return (
-      <StyledAnchor {...props} as={as} ref={ref}>
+      <Component
+        {...props}
+        className={cx(S.StyledAnchor, props.className)}
+        ref={ref}
+      >
         <Tooltip tooltip={tooltip}>{children}</Tooltip>
-      </StyledAnchor>
+      </Component>
     );
   },
 );
