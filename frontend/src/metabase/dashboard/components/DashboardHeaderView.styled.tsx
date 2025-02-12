@@ -10,7 +10,7 @@ import {
   breakpointMinSmall,
 } from "metabase/styled-components/theme";
 
-import { FixedWidthContainer } from "./Dashboard/Dashboard.styled";
+import { FixedWidthContainer } from "./Dashboard/DashboardComponents";
 import { SIDEBAR_WIDTH } from "./Sidebar";
 
 interface TypeForItemsThatRespondToNavBarOpen {

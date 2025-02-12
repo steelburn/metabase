@@ -6,7 +6,7 @@ import { isEmbeddingSdk } from "metabase/env";
 import type { MantineTheme } from "metabase/ui";
 import { SAVING_DOM_IMAGE_CLASS } from "metabase/visualizations/lib/save-chart-image";
 
-import { FIXED_WIDTH } from "./Dashboard/Dashboard.styled";
+import { FIXED_WIDTH } from "./Dashboard/DashboardComponents";
 
 interface DashboardCardProps {
   isAnimationDisabled?: boolean;

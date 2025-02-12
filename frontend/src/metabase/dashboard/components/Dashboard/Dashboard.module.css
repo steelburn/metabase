@@ -24,3 +24,103 @@
     flex-direction: column;
   }
 }
+
+.ParametersWidgetContainer {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  /* z-index should be higher than in dashcards */
+  z-index: 3;
+  top: 0;
+  left: 0;
+  /* this is for proper transitions from the \`transparent\` value to other values if set */
+  border-bottom: 1px solid transparent;
+
+  &.allowSticky {
+    position: sticky;
+  }
+
+  &.isNightMode {
+    --mb-color-text-secondary: color-mix(
+      in srgb,
+      var(--mb-base-color-white) 65%,
+      transparent
+    );
+    --mb-color-border: var(--mb-base-color-orion-60);
+    --mb-color-background: var(--mb-color-bg-black);
+  }
+
+  &.isSticky {
+    border-bottom-color: var(--mb-color-border);
+    background-color: var(--mb-color-bg-light);
+
+    &.isNightMode {
+      background-color: var(--mb-color-bg-black);
+    }
+
+    &.isEmbeddingSdk {
+      background-color: var(--mb-color-bg-dashboard);
+    }
+  }
+}
+
+.DashboardHeaderContainer {
+  z-index: 2;
+  background-color: var(--mb-color-background);
+  border-bottom: 1px solid var(--mb-color-border);
+
+  &.isFullscreen {
+    background-color: transparent;
+    border: none;
+  }
+
+  &.isNightMode {
+    color: var(--mb-color-text-white);
+  }
+}
+
+.DashboardBody {
+  flex: 1 0 auto;
+
+  &.isEditingOrSharing {
+    flex-basis: 0;
+  }
+}
+
+.ParametersAndCardsContainer {
+  flex: auto;
+  min-width: 0;
+  overflow-y: "visible";
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+
+  @supports (overflow-x: clip) {
+    overflow-x: clip;
+  }
+
+  padding-bottom: 40px;
+  align-self: flex-start;
+
+  /* Makes sure it doesn't use all the height, so the actual content height could be used in embedding #37437 */
+  &.shouldMakeDashboardHeaderStickyAfterScrolling {
+    overflow-y: auto;
+    align-self: auto;
+  }
+
+  &.isEmpty {
+    align-self: auto;
+  }
+}
+
+.DashboardStyled {
+  flex: 1 0 auto;
+}
+
+.DashboardLoadingAndErrorWrapper {
+  min-height: 100%;
+  height: 1px;
+
+  /* prevents header from scrolling so we can have a fixed sidebar */
+  &.isFullHeight {
+    height: 100%;
+  }
+}

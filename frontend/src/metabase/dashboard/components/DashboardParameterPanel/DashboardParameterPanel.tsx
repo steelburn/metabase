@@ -20,7 +20,7 @@ import {
   FixedWidthContainer,
   ParametersFixedWidthContainer,
   ParametersWidgetContainer,
-} from "../Dashboard/Dashboard.styled";
+} from "../Dashboard/DashboardComponents";
 import { DashboardParameterList } from "../DashboardParameterList";
 
 interface DashboardParameterPanelProps {
