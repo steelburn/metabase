@@ -177,6 +177,44 @@
              [:database ms/PositiveInt]]]
   (api.query-metadata/batch-fetch-query-metadata [query]))
 
+(defn encode-mongo
+  "Converts a Clojure representation of a Mongo aggregation pipeline to a formatted JSON string"
+  ([mgo] (encode-mongo mgo 0))
+  ([mgo indent-level]
+   (let [indent (apply str (repeat indent-level "    "))
+         next-indent (str indent "    ")]
+     (letfn [(encode-map [m next-indent]
+               (if (empty? m) "{}"
+                   (str "{\n"
+                        (->> m
+                             (map (fn [[k v]] (str next-indent "\"" (name k) "\": " (encode-mongo v (inc indent-level)))))
+                             (clojure.string/join ",\n"))
+                        "\n" indent "}")))
+             (encode-vector [v next-indent]
+               (if (empty? v) "[]"
+                   (str "[\n"
+                        (->> v
+                             (map #(str next-indent (encode-mongo % (inc indent-level))))
+                             (clojure.string/join ",\n"))
+                        "\n" indent "]")))
+             (encode-binary [bin]
+               (if (= (.getType bin) 4)
+                 (let [buffer (-> bin
+                                  .getData
+                                  java.nio.ByteBuffer/wrap)
+                       most-sig-bits (.getLong buffer)
+                       least-sig-bits (.getLong buffer)
+                       uuid (java.util.UUID. most-sig-bits least-sig-bits)]
+                   (str "UUID('" uuid "')"))
+                 (json/encode bin)))
+             (encode-object-id [oid] (str "ObjectId('" (.toString oid) "')"))]
+       (cond
+         (map? mgo) (encode-map mgo next-indent)
+         (vector? mgo) (encode-vector mgo next-indent)
+         (instance? org.bson.types.ObjectId mgo) (encode-object-id mgo)
+         (instance? org.bson.types.Binary mgo) (encode-binary mgo)
+         :else (json/encode mgo))))))
+
 (api.macros/defendpoint :post "/native"
   "Fetch a native version of an MBQL query."
   [_route-params
@@ -188,7 +226,8 @@
     (qp.perms/check-current-user-has-adhoc-native-query-perms query)
     (let [driver (driver.u/database->driver database)
           prettify (partial driver/prettify-native-form driver)
-          compiled (qp.compile/compile-with-inline-parameters query)]
+          compiled (qp.compile/compile-with-inline-parameters query)
+          compiled (assoc compiled :native-query (encode-mongo (:query compiled)))]
       (cond-> compiled
         pretty (update :query prettify)))))
 
