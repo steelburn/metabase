@@ -735,8 +735,10 @@ export const runWithoutCachingThenWithCaching = (
   { questions }: { questions: CollectionItem[] },
 ) => {
   callback({ isCachingEnabled: false });
+  cy.wait(2000);
   cy.signInAsAdmin().then(() => {
     cacheUnsandboxedResults(questions).then(() => {
+      cy.wait(2000);
       callback({ isCachingEnabled: true });
     });
   });
