@@ -310,6 +310,7 @@ export const widgetViewer: NormalUser = {
 };
 
 export const signInAs = (user: NormalUser) => {
+  cy.clearCookies();
   cy.log(`Sign in as user via an API call: ${user.email}`);
   return cy
     .request("POST", "/api/session", {
@@ -735,10 +736,8 @@ export const runWithoutCachingThenWithCaching = (
   { questions }: { questions: CollectionItem[] },
 ) => {
   callback({ isCachingEnabled: false });
-  cy.wait(2000);
   cy.signInAsAdmin().then(() => {
     cacheUnsandboxedResults(questions).then(() => {
-      cy.wait(2000);
       callback({ isCachingEnabled: true });
     });
   });
@@ -767,4 +766,9 @@ export const waitForUserToBeLoggedIn = (user: NormalUser) => {
   return check(5).then((success) => {
     expect(success, "User is logged in").to.be.true;
   });
+};
+
+export const signInAsAdmin = () => {
+  cy.clearCookies();
+  cy.signInAsAdmin();
 };
