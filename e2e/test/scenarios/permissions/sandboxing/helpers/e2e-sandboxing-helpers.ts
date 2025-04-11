@@ -509,6 +509,10 @@ export function rowsShouldContainGizmosAndWidgets({
 
 const productCategories = ["Gizmo", "Widget", "Doohickey", "Gadget"] as const;
 
+/** Assert that the rows in the given responses contain only one category,
+ * productCategory.
+ *
+ * We assume that the category is the first value in each row */
 export function rowsShouldContainOnlyOneCategory({
   responses,
   questions,
@@ -621,13 +625,11 @@ export const getCardResponses = (questions: SimpleCollectionItem[]) => {
       cy.request<DatasetResponse>("POST", `/api/card/${question.id}/query`),
     ),
   ).then((responses) => {
-    console.log("@m9cy9rpc", "responses", responses);
-
-    return { responses, questions };
-  }) as Cypress.Chainable<{
-    responses: DatasetResponse[];
-    questions: SimpleCollectionItem[];
-  }>;
+    return { responses, questions } as {
+      responses: DatasetResponse[];
+      questions: SimpleCollectionItem[];
+    };
+  });
 };
 
 export const getFieldValuesForProductCategories = () =>
@@ -668,12 +670,13 @@ export const assertNoResultsOrValuesAreSandboxed = (
     cardResponses.then(resultsShouldBeCached);
   }
 
-  H.visitQuestionAdhoc(adhocQuestionData, { timeout: 20000 }).then(
-    ({ response }) =>
-      rowsShouldContainGizmosAndWidgets({
-        responses: [response],
-        questions: [adhocQuestionData as unknown as SimpleCollectionItem],
-      }),
+  H.visitQuestionAdhoc(adhocQuestionData, {
+    waitOptions: { timeout: 20000 },
+  }).then(({ response }) =>
+    rowsShouldContainGizmosAndWidgets({
+      responses: [response],
+      questions: [adhocQuestionData as unknown as SimpleCollectionItem],
+    }),
   );
 
   getFieldValuesForProductCategories().then((response) =>
@@ -698,13 +701,14 @@ export const assertAllResultsAndValuesAreSandboxed = (
   getCardResponses(questions).then((data) =>
     rowsShouldContainOnlyOneCategory({ ...data, productCategory }),
   );
-  H.visitQuestionAdhoc(adhocQuestionData, { timeout: 20000 }).then(
-    ({ response }) =>
-      rowsShouldContainOnlyOneCategory({
-        responses: [response],
-        questions: [adhocQuestionData as unknown as SimpleCollectionItem],
-        productCategory,
-      }),
+  H.visitQuestionAdhoc(adhocQuestionData, {
+    waitOptions: { timeout: 20000 },
+  }).then(({ response }) =>
+    rowsShouldContainOnlyOneCategory({
+      responses: [response],
+      questions: [adhocQuestionData as unknown as SimpleCollectionItem],
+      productCategory,
+    }),
   );
 
   getFieldValuesForProductCategories().then((response) =>
