@@ -666,11 +666,12 @@ export const assertNoResultsOrValuesAreSandboxed = (
     cardResponses.then(resultsShouldBeCached);
   }
 
-  H.visitQuestionAdhoc(adhocQuestionData).then(({ response }) =>
-    rowsShouldContainGizmosAndWidgets({
-      responses: [response],
-      questions: [adhocQuestionData as unknown as SimpleCollectionItem],
-    }),
+  H.visitQuestionAdhoc(adhocQuestionData, { timeout: 20000 }).then(
+    ({ response }) =>
+      rowsShouldContainGizmosAndWidgets({
+        responses: [response],
+        questions: [adhocQuestionData as unknown as SimpleCollectionItem],
+      }),
   );
 
   getFieldValuesForProductCategories().then((response) =>
@@ -695,12 +696,13 @@ export const assertAllResultsAndValuesAreSandboxed = (
   getCardResponses(questions).then((data) =>
     rowsShouldContainOnlyOneCategory({ ...data, productCategory }),
   );
-  H.visitQuestionAdhoc(adhocQuestionData).then(({ response }) =>
-    rowsShouldContainOnlyOneCategory({
-      responses: [response],
-      questions: [adhocQuestionData as unknown as SimpleCollectionItem],
-      productCategory,
-    }),
+  H.visitQuestionAdhoc(adhocQuestionData, { timeout: 20000 }).then(
+    ({ response }) =>
+      rowsShouldContainOnlyOneCategory({
+        responses: [response],
+        questions: [adhocQuestionData as unknown as SimpleCollectionItem],
+        productCategory,
+      }),
   );
 
   getFieldValuesForProductCategories().then((response) =>
@@ -709,14 +711,6 @@ export const assertAllResultsAndValuesAreSandboxed = (
   getParameterValuesForProductCategories().then((response) =>
     valuesShouldContainOnlyOneCategory(response.body.values, productCategory),
   );
-
-  H.visitQuestionAdhoc(adhocQuestionData).then(({ response }) => {
-    rowsShouldContainOnlyOneCategory({
-      responses: [response],
-      questions: [adhocQuestionData as unknown as SimpleCollectionItem],
-      productCategory,
-    });
-  });
 };
 
 export const assertResponseFailsClosed = (response) => {

@@ -127,7 +127,13 @@ export function startNewNativeModel(config) {
  */
 export function visitQuestionAdhoc(
   question,
-  { callback, mode, autorun = true, skipWaiting = false } = {},
+  {
+    callback,
+    mode,
+    autorun = true,
+    skipWaiting = false,
+    waitOptions = {},
+  } = {},
 ) {
   const questionMode = mode === "notebook" ? "/notebook" : "";
 
@@ -141,7 +147,9 @@ export function visitQuestionAdhoc(
   runQueryIfNeeded(question, autorun);
 
   if (mode !== "notebook" && !skipWaiting) {
-    return cy.wait("@" + alias).then((xhr) => callback && callback(xhr));
+    return cy
+      .wait("@" + alias, waitOptions)
+      .then((xhr) => callback && callback(xhr));
   }
 
   // Ensure chainability
