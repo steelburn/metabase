@@ -28,7 +28,7 @@ export const FkTargetPicker = ({
   onChange,
   ...props
 }: Props) => {
-  const comparableIdFields = idFields.filter(idField => {
+  const comparableIdFields = idFields.filter((idField) => {
     return idField.isComparableWith(field);
   });
   const hasIdFields = comparableIdFields.length > 0;
@@ -36,7 +36,7 @@ export const FkTargetPicker = ({
   const data = getData(comparableIdFields, includeSchema);
 
   const getField = (fieldId: FieldId | null) => {
-    const option = data.find(option => parseValue(option.value) === fieldId);
+    const option = data.find((option) => parseValue(option.value) === fieldId);
     return option?.field;
   };
 
@@ -51,6 +51,9 @@ export const FkTargetPicker = ({
       comboboxProps={{
         middlewares: {
           flip: true,
+          size: {
+            padding: 6,
+          },
         },
         position: "bottom-start",
         width: 300,
@@ -61,7 +64,7 @@ export const FkTargetPicker = ({
       filter={({ options, search }) => {
         const query = search.toLowerCase().trim();
 
-        return options.filter(option => {
+        return options.filter((option) => {
           if ("group" in option) {
             return false;
           }
@@ -82,7 +85,7 @@ export const FkTargetPicker = ({
       fw="bold"
       nothingFoundMessage={t`Didn't find any results`}
       placeholder={getFkFieldPlaceholder(field, comparableIdFields)}
-      renderOption={item => {
+      renderOption={(item) => {
         const field = getField(parseValue(item.option.value));
         const selected = parseValue(item.option.value) === value;
 
@@ -114,7 +117,7 @@ export const FkTargetPicker = ({
 
 function getData(comparableIdFields: Field[], includeSchema: boolean) {
   return comparableIdFields
-    .map(field => ({
+    .map((field) => ({
       field,
       label: field.displayName({ includeTable: true, includeSchema }),
       value:
@@ -138,7 +141,7 @@ function getFkFieldPlaceholder(field: ApiField, idFields: Field[]) {
   const isRestrictedFKTargetSelected =
     isFK(field) &&
     field.fk_target_field_id != null &&
-    !idFields?.some(idField => idField.id === field.fk_target_field_id);
+    !idFields?.some((idField) => idField.id === field.fk_target_field_id);
 
   if (isRestrictedFKTargetSelected) {
     return t`Field access denied`;
@@ -148,6 +151,6 @@ function getFkFieldPlaceholder(field: ApiField, idFields: Field[]) {
 }
 
 function hasMultipleSchemas(field: Field[]) {
-  const schemas = new Set(field.map(field => field.table?.schema));
+  const schemas = new Set(field.map((field) => field.table?.schema));
   return schemas.size > 1;
 }

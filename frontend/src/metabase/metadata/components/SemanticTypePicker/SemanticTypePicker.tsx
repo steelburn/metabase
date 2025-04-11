@@ -34,6 +34,9 @@ export const SemanticTypePicker = ({
       comboboxProps={{
         middlewares: {
           flip: true,
+          size: {
+            padding: 6,
+          },
         },
         position: "bottom-start",
         width: 300,
@@ -60,7 +63,7 @@ function stringifyValue(value: string | null): string {
 
 function getData({ field, value }: Pick<Props, "field" | "value">) {
   const options = getCompatibleSemanticTypes(field, value)
-    .map(option => ({
+    .map((option) => ({
       label: option.name,
       value: stringifyValue(option.id),
       section: option.section,

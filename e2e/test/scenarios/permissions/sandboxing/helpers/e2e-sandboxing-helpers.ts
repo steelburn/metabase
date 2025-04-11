@@ -16,26 +16,37 @@ import type {
 
 import type { DashcardQueryResponse, DatasetResponse } from "./types";
 
+type SimpleCollectionItem = Pick<CollectionItem, "id" | "name">;
+
 const { H } = cy;
 const { ALL_USERS_GROUP, DATA_GROUP, COLLECTION_GROUP } = USER_GROUPS;
 const { PRODUCTS_ID, ORDERS_ID, ORDERS, PRODUCTS } = SAMPLE_DATABASE;
 
-type CustomColumnType = "boolean" | "string" | "number";
+const customColumnTypeToFormulaUntyped = {
+  booleanExpr: '[Category]="Gizmo"',
+  stringExpr: 'concat("Category is ",[Category])',
+  numberExpr: 'if([Category] = "Gizmo", 1, 0)',
+  booleanLiteral: "true",
+  stringLiteral: '"fixed literal string"',
+  numberLiteral: "1",
+} as const;
+
+type CustomColumnType = keyof typeof customColumnTypeToFormulaUntyped;
 type CustomViewType = "Question" | "Model";
 
 type SandboxPolicy = {
   filterTableBy: "column" | "custom_view";
   customViewType?: CustomViewType;
   customViewName?: string;
-  customColumnType?: "number" | "string" | "boolean";
+  customColumnType?: CustomColumnType;
   filterColumn?: string;
 };
 
-const customColumnTypeToFormula: Record<CustomColumnType, string> = {
-  boolean: '[Category]="Gizmo"',
-  string: 'concat("Category is ",[Category])',
-  number: 'if([Category] = "Gizmo", 1, 0)',
-};
+const customColumnTypeToFormula: Record<CustomColumnType, string> =
+  customColumnTypeToFormulaUntyped;
+const customColumnTypes = Object.keys(
+  customColumnTypeToFormula,
+) as CustomColumnType[];
 
 const addCustomColumnToQuestion = (customColumnType: CustomColumnType) => {
   cy.log("Add a custom column");
@@ -163,9 +174,7 @@ export const adhocQuestionData = {
 function addCustomColumnsToQuestion() {
   H.openNotebook();
   H.getNotebookStep("data").button("Custom column").click();
-  addCustomColumnToQuestion("boolean");
-  addCustomColumnToQuestion("number");
-  addCustomColumnToQuestion("string");
+  customColumnTypes.forEach((type) => addCustomColumnToQuestion(type));
   H.visualize();
 
   // for some reason we can't use the saveQuestion helper here
@@ -180,7 +189,7 @@ function addCustomColumnsToQuestion() {
  * all of them reside in a single collection
  */
 export const createSandboxingDashboardAndQuestions = () => {
-  customViews.forEach(view => H.createQuestion(view));
+  customViews.forEach((view) => H.createQuestion(view));
 
   H.createCollection({ name: "Sandboxing", alias: "sandboxingCollectionId" });
 
@@ -188,14 +197,14 @@ export const createSandboxingDashboardAndQuestions = () => {
     H.createDashboardWithQuestions({
       dashboardName: "Dashboard with sandboxable questions",
       dashboardDetails: { collection_id: collectionId },
-      questions: questionData.map(questionDetails => ({
+      questions: questionData.map((questionDetails) => ({
         ...questionDetails,
         collection_id: collectionId,
       })),
     }).then(({ dashboard, questions }) => {
       cy.log("Add question based on saved question");
       const savedQuestionId = questions.find(
-        q => q.name === savedQuestion.name,
+        (q) => q.name === savedQuestion.name,
       )?.id;
       H.createQuestionAndAddToDashboard(
         {
@@ -210,7 +219,7 @@ export const createSandboxingDashboardAndQuestions = () => {
       );
 
       cy.log("Add question based on model");
-      const modelId = questions.find(q => q.name === model.name)?.id;
+      const modelId = questions.find((q) => q.name === model.name)?.id;
       H.createQuestionAndAddToDashboard(
         {
           name: "Question based on model",
@@ -303,20 +312,20 @@ export const assignAttributeToUser = ({
   attributeValue: string;
 }) => {
   cy.request("GET", "/api/user")
-    .then(response => {
+    .then((response) => {
       const userData = response.body.data.find(
         (u: { email: string }) => u.email === user.email,
       );
       return userData.id;
     })
-    .then(userId => {
+    .then((userId) => {
       return cy.request("GET", `/api/user/${userId}`);
     })
-    .then(response => {
+    .then((response) => {
       const user = response.body;
       return user;
     })
-    .then(user => {
+    .then((user) => {
       cy.request("PUT", `/api/user/${user.id}`, {
         ...user,
         login_attributes: {
@@ -326,24 +335,29 @@ export const assignAttributeToUser = ({
     });
 };
 
-export const configureSandboxPolicy = (policy: SandboxPolicy) => {
+export const configureSandboxPolicy = (
+  policy: SandboxPolicy,
+  { databaseId = 1, tableName = "Products" } = {},
+) => {
   const { filterTableBy, customViewName, customViewType, filterColumn } =
     policy;
 
   cy.log(`Configure sandboxing policy: ${JSON.stringify(policy)}`);
-  cy.log("Show the permissions configuration for the Sample Database");
-  cy.visit("/admin/permissions/data/database/1");
   cy.log(
-    "Show the permissions configuration for the Sample Database's Products table",
+    `Show the permissions configuration for the database with id ${databaseId}`,
   );
-  cy.findByRole("menuitem", { name: /Products/ }).click();
+  cy.visit(`/admin/permissions/data/database/${databaseId}`);
+  cy.log(`Show the permissions configuration for the table named ${tableName}`);
+  cy.findByRole("menuitem", { name: tableName }).click();
   cy.log("Modify the sandboxing policy for the 'data' group");
   H.modifyPermission("data", 0, "Sandboxed");
 
-  H.modal().within(() => {
-    cy.findByText(/Change access to this database to .*Sandboxed.*?/);
-    cy.button("Change").click();
-  });
+  if (databaseId === 1) {
+    H.modal().within(() => {
+      cy.findByText(/Change access to this database to .*Sandboxed.*?/);
+      cy.button("Change").click();
+    });
+  }
 
   H.modal().findByText(/Restrict access to this table/);
 
@@ -381,7 +395,7 @@ export const configureSandboxPolicy = (policy: SandboxPolicy) => {
   cy.log("Ensure the summary contains the correct text");
   cy.findByLabelText(/Summary/)
     .invoke("text")
-    .should(summary => {
+    .should((summary) => {
       expect(summary).to.contain("Users in data can view");
       if (filterColumn) {
         expect(summary).to.contain(`${filterColumn} field equals`);
@@ -400,7 +414,7 @@ const getQuestionDescription = (
 ) => {
   // Extract the card ID from the response URL
   const cardId = Number(response?.url?.match(/\/card\/(\d+)/)?.[1]);
-  const questionName = (questions.find(q => q.id === cardId) as any)?.name as
+  const questionName = (questions.find((q) => q.id === cardId) as any)?.name as
     | string
     | undefined;
   const query = JSON.stringify(response.body.json_query.query);
@@ -416,7 +430,7 @@ export function rowsShouldContainGizmosAndWidgets({
   questions: CollectionItem[];
 }) {
   expect(responses.length).to.equal(questions.length);
-  responses.forEach(response => {
+  responses.forEach((response) => {
     const { questionDesc } = getQuestionDescription(response, questions);
     expect(
       JSON.stringify(response.body),
@@ -428,13 +442,13 @@ export function rowsShouldContainGizmosAndWidgets({
     ).to.be.false;
     const rows = response.body.data.rows;
     expect(
-      rows.some(row => row.includes("Gizmo")),
+      rows.some((row) => row.includes("Gizmo")),
       `Results include at least one Gizmo in ${questionDesc}`,
     ).to.be.true;
 
     expect(
       rows.some(
-        row =>
+        (row) =>
           row.includes("Widget") ||
           row.includes("Gadget") ||
           row.includes("Doohickey"),
@@ -452,21 +466,26 @@ export function rowsShouldContainOnlyOneCategory({
   productCategory,
 }: {
   responses: DatasetResponse[];
-  questions: CollectionItem[];
+  questions: SimpleCollectionItem[];
   productCategory: (typeof productCategories)[number];
 }) {
-  expect(responses.length).to.equal(questions.length);
+  expect(responses.length, "Correct number of responses").to.equal(
+    questions.length,
+  );
 
-  responses.forEach(response => {
+  responses.forEach((response) => {
     const { questionDesc } = getQuestionDescription(response, questions);
     cy.log(`Results contain only ${productCategory}s in: ${questionDesc}`);
-    expect(response?.body.data.is_sandboxed).to.be.true;
+    expect(
+      response?.body.data.is_sandboxed,
+      `Response is sandboxed for: ${questionDesc}`,
+    ).to.be.true;
 
     const rows = response.body.data.rows;
 
     expect(
       rows.every(
-        row =>
+        (row) =>
           row.includes(productCategory) ||
           // With implicit joins, some rows might have a null product
           row[0] === null,
@@ -474,10 +493,10 @@ export function rowsShouldContainOnlyOneCategory({
       `Every result should have have a ${productCategory} in: ${questionDesc}`,
     ).to.be.true;
     productCategories
-      .filter(category => category !== productCategory)
-      .forEach(otherCategory => {
+      .filter((category) => category !== productCategory)
+      .forEach((otherCategory) => {
         expect(
-          !rows.some(row => row.includes(otherCategory)),
+          !rows.some((row) => row.includes(otherCategory)),
           `No results should have ${otherCategory}s in: ${questionDesc}`,
         ).to.be.true;
       });
@@ -487,7 +506,7 @@ export function rowsShouldContainOnlyOneCategory({
 export const valuesShouldContainGizmosAndWidgets = (
   valuesArray: (FieldValue | ParameterValue)[],
 ) => {
-  const values = valuesArray.map(val => val[0]);
+  const values = valuesArray.map((val) => val[0]);
   expect(values).to.contain("Gizmo");
   expect(values).to.contain("Widget");
 };
@@ -496,38 +515,38 @@ export const valuesShouldContainOnlyOneCategory = (
   valuesArray: (FieldValue | ParameterValue)[],
   productCategory: (typeof productCategories)[number],
 ) => {
-  const values = valuesArray.map(val => val[0]);
+  const values = valuesArray.map((val) => val[0]);
   expect(values).to.deep.equal([productCategory]);
 };
 
 export const getDashcardResponses = (
   dashboard: Dashboard | null,
-  questions: CollectionItem[],
+  questions: SimpleCollectionItem[],
 ) => {
   H.visitDashboard(checkNotNull(dashboard).id);
 
   expect(questions.length).to.be.greaterThan(0);
   return cy
     .wait(new Array(questions.length).fill("@dashcardQuery"))
-    .then(interceptions => {
+    .then((interceptions) => {
       const responses = interceptions.map(
-        i => i.response as unknown as DashcardQueryResponse,
+        (i) => i.response as unknown as DashcardQueryResponse,
       );
       return { questions, responses };
     });
 };
 
-export const getCardResponses = (questions: CollectionItem[]) => {
+export const getCardResponses = (questions: SimpleCollectionItem[]) => {
   expect(questions.length).to.be.greaterThan(0);
   return H.cypressWaitAll(
-    questions.map(question =>
+    questions.map((question) =>
       cy.request<DatasetResponse>("POST", `/api/card/${question.id}/query`),
     ),
-  ).then(responses => {
-    return { responses: responses, questions: questions };
+  ).then((responses) => {
+    return { responses, questions };
   }) as Cypress.Chainable<{
     responses: DatasetResponse[];
-    questions: CollectionItem[];
+    questions: SimpleCollectionItem[];
   }>;
 };
 
@@ -553,7 +572,7 @@ export const getParameterValuesForProductCategories = () =>
 
 export const assertNoResultsOrValuesAreSandboxed = (
   dashboard: Dashboard | null,
-  questions: CollectionItem[],
+  questions: SimpleCollectionItem[],
 ) => {
   checkNotNull(dashboard);
   getDashcardResponses(dashboard, questions).then(
@@ -564,44 +583,49 @@ export const assertNoResultsOrValuesAreSandboxed = (
   H.visitQuestionAdhoc(adhocQuestionData).then(({ response }) =>
     rowsShouldContainGizmosAndWidgets({
       responses: [response],
-      questions: [adhocQuestionData as unknown as CollectionItem],
+      questions: [adhocQuestionData as unknown as SimpleCollectionItem],
     }),
   );
 
-  getFieldValuesForProductCategories().then(response =>
+  getFieldValuesForProductCategories().then((response) =>
     valuesShouldContainGizmosAndWidgets(response.body.values),
   );
 
-  getParameterValuesForProductCategories().then(response =>
+  getParameterValuesForProductCategories().then((response) =>
     valuesShouldContainGizmosAndWidgets(response.body.values),
   );
 };
 
 export const assertAllResultsAndValuesAreSandboxed = (
   dashboard: Dashboard | null,
-  questions: CollectionItem[],
+  questions: SimpleCollectionItem[],
   productCategory: (typeof productCategories)[number],
 ) => {
   checkNotNull(dashboard);
 
-  getDashcardResponses(dashboard, questions).then(data =>
+  getDashcardResponses(dashboard, questions).then((data) =>
     rowsShouldContainOnlyOneCategory({ ...data, productCategory }),
   );
-  getCardResponses(questions).then(data =>
+  getCardResponses(questions).then((data) =>
     rowsShouldContainOnlyOneCategory({ ...data, productCategory }),
   );
   H.visitQuestionAdhoc(adhocQuestionData).then(({ response }) =>
     rowsShouldContainOnlyOneCategory({
       responses: [response],
-      questions: [adhocQuestionData as unknown as CollectionItem],
+      questions: [adhocQuestionData as unknown as SimpleCollectionItem],
       productCategory,
     }),
   );
 
-  getFieldValuesForProductCategories().then(response =>
+  getFieldValuesForProductCategories().then((response) =>
     valuesShouldContainOnlyOneCategory(response.body.values, productCategory),
   );
-  getParameterValuesForProductCategories().then(response =>
+  getParameterValuesForProductCategories().then((response) =>
     valuesShouldContainOnlyOneCategory(response.body.values, productCategory),
   );
+};
+
+export const assertResponseFailsClosed = (response) => {
+  expect(response?.body.data.rows).to.have.length(0);
+  expect(response?.body.error_type).to.contain("invalid-query");
 };
