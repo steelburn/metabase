@@ -81,7 +81,12 @@ module.exports = (env) => {
           resourceQuery: { not: [/component|source/] },
         },
         {
+          test: /sdk\-styles\.css$/,
+          type: "asset/source",
+        },
+        {
           test: /\.css$/,
+          exclude: /sdk\-styles\.css$/,
           use: [
             { loader: MiniCssExtractPlugin.loader },
             { loader: "css-loader", options: CSS_CONFIG },
@@ -141,7 +146,7 @@ module.exports = (env) => {
     plugins: [
       // Style extraction for web components
       new MiniCssExtractPlugin({
-        filename: "styles.css",
+        filename: "sdk-styles.css",
         chunkFilename: "[id].css",
       }),
       new WebpackManifestPlugin({
@@ -197,6 +202,7 @@ module.exports = (env) => {
     ...mainConfig.resolve.alias,
     "ee-plugins": ENTERPRISE_SRC_PATH + "/plugins",
     "ee-overrides": ENTERPRISE_SRC_PATH + "/overrides",
+    "@sdk-styles": BUILD_PATH + "/dist/sdk-styles.css",
   };
 
   if (config.cache) {
