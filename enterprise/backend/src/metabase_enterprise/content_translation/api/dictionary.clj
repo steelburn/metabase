@@ -6,11 +6,24 @@
    [clojure.string :as str]
    [metabase.util.i18n :as i18n :refer [tru]]
    [metabase.util.log :as log]
-   [toucan2.core :as t2]))
+   [toucan2.core :as t2])
+  (:import
+   (java.io File)))
 
 (set! *warn-on-reflection* true)
 
 (def ^:private http-status-unprocessable 422)
+(def ^:private http-status-content-too-large 413)
+
+;; Maximum file size: 1.5MB
+;; This should equal the maxFileSizeInMiB variable in
+;; enterprise/frontend/src/metabase-enterprise/content_translation/components/ContentTranslationConfiguration.tsx
+(def ^:private max-file-size (* 1.5 1024 1024))
+
+(defn- row-has-correct-number-of-fields
+  "Checks if a row has the expected format with exactly 3 columns."
+  [row]
+  (and (vector? row) (= (count row) 3)))
 
 (defn- collect-row-format-error
   "Returns an error message if a row does not have the expected format."
@@ -31,6 +44,16 @@
     (tru "Row {0}: The string \"{1}\" is translated into locale \"{2}\" earlier in the file"
          (+ row-index 2) trimmed-msgid locale)))
 
+(defn- check-file-size
+  "Throws an error message if the file is too large. Note that frontend will also refuse to upload a file that's too large."
+  [^File file]
+  (let [file-size (.length file)]
+    (when (> file-size max-file-size)
+      (throw (ex-info (tru "Upload a dictionary smaller than {0}MB." (/ max-file-size (* 1024 1024)))
+                      {:status-code http-status-content-too-large
+                       :file-size file-size
+                       :max-size max-file-size})))))
+
 (defn- read-csv-file
   "Read CSV file content, skipping the header row. Throws a formatted exception if parsing fails."
   [reader]
@@ -49,11 +72,6 @@
    (or
     (str/blank? msgstr)
     (re-matches #"^[,;\s]*$" msgstr))))
-
-(defn- row-has-correct-number-of-fields
-  "Checks if a row has the expected format with exactly 3 columns."
-  [row]
-  (= (count row) 3))
 
 (defn- validate-row
   "Validate a single row of CSV data, returning errors and the updated set of seen translation keys."
@@ -74,6 +92,8 @@
   "Import translations from CSV and insert or update rows in the content_translation table."
   [{:keys [file]}]
   (with-open [reader (io/reader file)]
+    (check-file-size file)
+
     ; Validate all rows before proceeding
     (let [csv-data (read-csv-file reader)
           errors (seq
