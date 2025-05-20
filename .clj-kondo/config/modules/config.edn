@@ -1645,7 +1645,7 @@
 
   enterprise/tenants
   {:api #{}
-   :uses #{api util}}
+   :uses #{api util request}}
 
   enterprise/upload-management
   {:api  #{metabase-enterprise.upload-management.api}
