@@ -31,14 +31,14 @@ interface Props {
     name: string | undefined;
     parameterMappings: RowActionFieldSettings[];
   }) => void;
-  tableActions?: WritebackAction[];
+  actions?: WritebackAction[];
 }
 
 export function RowActionSettingsModalContent({
   action: editedAction,
   rowActionSettings,
   tableColumns,
-  tableActions,
+  actions,
   onClose,
   onSubmit,
 }: Props) {
@@ -125,6 +125,7 @@ export function RowActionSettingsModalContent({
   return (
     <ActionSettingsWrapper
       style={{
+        padding: 0,
         height: "78vh",
         minWidth: isEditMode ? "auto" : undefined,
       }}
@@ -135,7 +136,7 @@ export function RowActionSettingsModalContent({
           <ConnectedActionPicker
             currentAction={selectedAction}
             onClick={handlePickAction}
-            editableActions={tableActions}
+            actions={actions}
           />
         </Box>
       )}
