@@ -17,6 +17,7 @@ import type {
 import { RowActionItem } from "./RowActionItem";
 import { RowActionSettingsModalContent } from "./RowActionSettingsModalContent";
 import { useRowActionEditingModal } from "./use-row-action-editing-modal";
+import { useGetActionsQuery } from "metabase-enterprise/api";
 
 const DEFAULT_ACTIONS = [
   {
@@ -53,6 +54,7 @@ export const ConfigureEditableTableActions = ({
   const { enabledActions, enabledActionsMap } = useMemo(() => {
     const enabledActions =
       dashcard.visualization_settings?.["editableTable.enabledActions"] ?? [];
+    debugger;
 
     const enabledActionsMap = enabledActions.reduce((result, item) => {
       result.set(item.id, item);
@@ -62,7 +64,12 @@ export const ConfigureEditableTableActions = ({
     return { enabledActions, enabledActionsMap };
   }, [dashcard.visualization_settings]);
 
-  const { data: actions } = useListActionsQuery({}); // TODO: we should have an api to optimize this
+  // const { data: actions } = useListActionsQuery({}); // TODO: we should have an api to optimize this
+  const { data: actions } = useGetActionsQuery();
+  const tableActions = useMemo(
+    () => actions?.filter((action) => "table_id" in action),
+    [actions],
+  );
 
   const tableColumns = useMemo(() => {
     const fieldsWithRemmapedColumns = dashcard.card.result_metadata ?? [];
@@ -79,6 +86,9 @@ export const ConfigureEditableTableActions = ({
   const addedRowActions =
     actions?.filter(({ id }) => enabledActionsMap.get(id)) || [];
 
+  console.log({ enabledActions, enabledActionsMap, addedRowActions });
+  console.log({ actions });
+
   const editingActionSetting = editingAction
     ? enabledActionsMap.get(editingAction.id)
     : undefined;
@@ -86,6 +96,7 @@ export const ConfigureEditableTableActions = ({
   const handleToggleAction = useCallback(
     ({ id, enabled }: EditableTableRowActionDisplaySettings) => {
       const newArray = [...enabledActions];
+      debugger;
 
       const actionIndex = enabledActions.findIndex(
         (action) => action.id === id,
@@ -122,6 +133,7 @@ export const ConfigureEditableTableActions = ({
       name: string | undefined;
       parameterMappings: RowActionFieldSettings[];
     }) => {
+      debugger;
       const newItem: EditableTableRowActionDisplaySettings = {
         id: action.id,
         enabled: true,
@@ -189,6 +201,8 @@ export const ConfigureEditableTableActions = ({
     [dashcard.id, dispatch, enabledActions],
   );
 
+  // console.log({ addedRowActions, dashcard });
+
   return (
     <>
       <Stack gap="xs">
@@ -240,6 +254,7 @@ export const ConfigureEditableTableActions = ({
             action={editingAction}
             rowActionSettings={editingActionSetting}
             tableColumns={tableColumns}
+            tableActions={tableActions}
             onSubmit={editingAction ? handleEditAction : handleAddAction}
             onClose={cancelEditAction}
           />

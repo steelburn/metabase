@@ -16,6 +16,7 @@ import type {
 } from "metabase-types/api";
 
 import { remapRowActionMappingsToActionOverride } from "./utils";
+import { useGetActionsQuery } from "metabase-enterprise/api";
 
 export const useTableActions = ({
   visualizationSettings,
@@ -30,7 +31,8 @@ export const useTableActions = ({
     actionOverrides?: EditableTableActionsVizOverride;
   } | null>(null);
 
-  const { data: actions } = useListActionsQuery({});
+  // const { data: actions } = useListActionsQuery({});
+  const { data: actions } = useGetActionsQuery();
 
   const {
     hasCreateAction,
@@ -67,6 +69,8 @@ export const useTableActions = ({
           };
         }) || [];
 
+    console.log({ enabledRowActions });
+
     return {
       hasCreateAction,
       hasDeleteAction,
@@ -86,6 +90,8 @@ export const useTableActions = ({
       const rowData = datasetData.rows[rowIndex];
 
       const vizSettings = enabledActionsVizSettingsSet.get(action.id);
+
+      debugger;
 
       const remappedInitialActionValues = action.parameters?.reduce(
         (result, parameter) => {
