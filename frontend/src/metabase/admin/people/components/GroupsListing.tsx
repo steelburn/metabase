@@ -528,12 +528,13 @@ export class GroupsListing extends Component<
       <AdminPaneLayout
         title={t`Groups`}
         titleActions={
-          isAdmin && !this.state.showAddGroupRow ? (
+          isAdmin &&
+          !this.state.showAddGroupRow && (
             <Button
               variant="filled"
               onClick={this.onCreateAGroupButtonClicked.bind(this)}
             >{t`Create a group`}</Button>
-          ) : null
+          )
         }
         description={t`You can use groups to control your users' access to your data. Put users in groups and then go to the Permissions section to control each group's access. The Administrators and All Users groups are special default groups that can't be removed.`}
         headerContent={
