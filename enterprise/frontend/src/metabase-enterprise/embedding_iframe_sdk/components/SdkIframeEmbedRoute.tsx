@@ -122,6 +122,7 @@ const SdkIframeEmbedView = ({
           height="100%"
           initialSqlParameters={settings.initialSqlParameters}
           title={settings.withTitle}
+          isSaveEnabled={false}
         />
       ),
     )
