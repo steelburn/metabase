@@ -19,7 +19,6 @@ import type {
 import { RowActionParameterMappingForm } from "./RowActionParameterMappingForm";
 import S from "./RowActionSettingsModalContent.module.css";
 import { isValidMapping } from "./utils";
-import { useGetActionsQuery } from "metabase-enterprise/api";
 
 interface Props {
   action: WritebackAction | null | undefined;
