@@ -35,7 +35,9 @@ const DEFAULT_OPTIONS = {};
 const FILTER_MODEL_MAP: Record<EntityTypeFilterKeys, DataPickerValue["model"]> =
   {
     table: "table",
+    question: "card",
     model: "dataset",
+    metric: "metric",
   };
 const mapEntityTypeFilterToDataPickerModels = (
   entityTypeFilter: InteractiveQuestionProviderProps["entityTypeFilter"],
