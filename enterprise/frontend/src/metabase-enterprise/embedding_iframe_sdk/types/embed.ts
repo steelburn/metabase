@@ -83,12 +83,6 @@ type CollectionBrowserEntityTypes =
   | "question"
   | "model";
 
-export type EmbedOptions =
-  | DashboardEmbedOptions
-  | QuestionEmbedOptions
-  | ExplorationEmbedOptions
-  | CurationEmbedOptions;
-
 type SdkIframeEmbedBaseSettings = {
   apiKey: string;
   instanceUrl: string;
