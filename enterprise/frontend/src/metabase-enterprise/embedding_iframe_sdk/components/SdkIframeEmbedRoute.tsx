@@ -94,6 +94,7 @@ const SdkIframeEmbedView = ({
           initialParameters={settings.initialParameters}
           hiddenParameters={settings.hiddenParameters}
           drillThroughQuestionHeight="100%"
+          drillThroughQuestionProps={{ isSaveEnabled: false }}
         />
       ),
     )
