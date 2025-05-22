@@ -4,4 +4,5 @@ export const ENTERPRISE_TAG_TYPES = [
   "scim",
   METABOT_TAG,
   "gsheets-status",
+  "tenants",
 ] as const;

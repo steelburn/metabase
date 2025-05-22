@@ -768,5 +768,6 @@ export const PLUGIN_API = {
 
 export const PLUGIN_TENANTS = {
   userStrategyRoute: null as React.ReactElement | null,
+  tenantsRoutes: null as React.ReactElement | null,
   EditUserStrategySettingsButton: PluginPlaceholder,
 };

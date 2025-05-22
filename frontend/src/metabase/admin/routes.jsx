@@ -116,6 +116,10 @@ const getRoutes = (store, CanAccessSettings, IsAdmin) => (
           </Route>
         </Route>
       </Route>
+
+      {/* Tenants */}
+      {PLUGIN_TENANTS.tenantsRoutes}
+
       {/* Troubleshooting */}
       <Route
         path="troubleshooting"
