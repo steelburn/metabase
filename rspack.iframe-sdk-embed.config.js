@@ -2,6 +2,7 @@
 /* eslint-disable no-undef */
 
 const fs = require("fs");
+
 const path = require("path");
 
 const ENTERPRISE_SRC_PATH =
@@ -68,7 +69,7 @@ module.exports = {
           fs.copyFileSync(tempPath, appPath);
 
           // cleanup the temp directory to prevent bloat.
-          fs.rmSync(tempPath, { recursive: true });
+          fs.rmSync(OUT_TEMP_PATH, { recursive: true });
         });
       },
     },
