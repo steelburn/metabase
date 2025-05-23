@@ -5,16 +5,14 @@ import EmptyDashboardBot from "assets/img/dashboard-empty.svg";
 import { skipToken, useGetTableQueryMetadataQuery } from "metabase/api";
 import EmptyState from "metabase/components/EmptyState";
 import { LoadingAndErrorWrapper } from "metabase/components/LoadingAndErrorWrapper";
-import Link from "metabase/core/components/Link";
 import { getRawTableFieldId } from "metabase/metadata/utils/field";
 import { PLUGIN_FEATURE_LEVEL_PERMISSIONS } from "metabase/plugins";
-import { Box, Flex, Icon, Stack } from "metabase/ui";
+import { Box, Flex } from "metabase/ui";
 
 import S from "./DataModel.module.css";
 import {
   FieldSection,
   PreviewSection,
-  RouterTablePicker,
   TableSection,
   usePreviewType,
 } from "./components";
@@ -26,7 +24,7 @@ interface Props {
 }
 
 export const DataModel = ({ params }: Props) => {
-  const { databaseId, tableId, schemaId, fieldId } = parseRouteParams(params);
+  const { databaseId, tableId, fieldId } = parseRouteParams(params);
   const isEmptyStateShown =
     databaseId == null || tableId == null || fieldId == null;
   const {
@@ -46,28 +44,7 @@ export const DataModel = ({ params }: Props) => {
   const [previewType, setPreviewType] = usePreviewType();
 
   return (
-    <Flex h="100%" bg="bg-light">
-      <Stack
-        className={S.sidebar}
-        flex="0 0 25%"
-        miw="320px"
-        gap={0}
-        h="100%"
-        bg="bg-white"
-      >
-        <RouterTablePicker
-          databaseId={databaseId}
-          schemaId={schemaId}
-          tableId={tableId}
-        />
-        <Box mx="xl" py="sm" className={S.footer}>
-          <Link to="/admin/datamodel/segments" className={S.segmentsLink}>
-            <Icon name="pie" className={S.segmentsIcon} />
-            {t`Segments`}
-          </Link>
-        </Box>
-      </Stack>
-
+    <>
       {tableId && (
         <Box className={S.sidebar} flex="0 0 25%" h="100%" miw="400px">
           <Box p="xl" pb="lg">
@@ -151,6 +128,6 @@ export const DataModel = ({ params }: Props) => {
           )}
         </>
       )}
-    </Flex>
+    </>
   );
 };

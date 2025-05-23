@@ -1,5 +1,6 @@
 .sidebar {
   border-right: 1px solid var(--mb-color-border);
+  background: var(--mb-color-bg-light);
   overflow: auto;
 
   &.noBorder {
@@ -13,31 +14,4 @@
 
 .contentLoadingAndErrorWrapper {
   height: 100%;
-}
-
-.footer {
-  border-top: 1px solid var(--mb-color-border);
-}
-
-.segmentsLink {
-  display: flex;
-  align-items: center;
-  gap: var(--mantine-spacing-sm);
-  border-radius: 8px;
-  cursor: pointer;
-  padding: var(--mantine-spacing-sm);
-
-  &:hover {
-    background-color: var(--mb-color-brand-lighter);
-    color: var(--mb-color-brand);
-
-    .segmentsIcon {
-      opacity: 1;
-    }
-  }
-}
-
-.segmentsIcon {
-  opacity: 0.5;
-  flex-shrink: 0;
 }
