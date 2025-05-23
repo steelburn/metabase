@@ -13,7 +13,9 @@ import type {
   EditableTableRowActionDisplaySettings,
   Field,
   RowActionFieldSettings,
+  TableAction,
   WritebackAction,
+  WritebackParameter,
 } from "metabase-types/api";
 
 import { RowActionParameterMappingForm } from "./RowActionParameterMappingForm";
@@ -21,16 +23,16 @@ import S from "./RowActionSettingsModalContent.module.css";
 import { isValidMapping } from "./utils";
 
 interface Props {
-  action: WritebackAction | null | undefined;
+  action: WritebackAction | TableAction | null | undefined;
   rowActionSettings: EditableTableRowActionDisplaySettings | undefined;
   tableColumns: Field[];
   onClose: () => void;
   onSubmit: (actionParams: {
-    action: WritebackAction;
+    action: WritebackAction | TableAction;
     name: string | undefined;
     parameterMappings: RowActionFieldSettings[];
   }) => void;
-  actions?: WritebackAction[];
+  actions?: (WritebackAction | TableAction)[];
 }
 
 export function RowActionSettingsModalContent({
@@ -41,9 +43,9 @@ export function RowActionSettingsModalContent({
   onClose,
   onSubmit,
 }: Props) {
-  const [selectedAction, setSelectedAction] = useState<WritebackAction | null>(
-    editedAction || null,
-  );
+  const [selectedAction, setSelectedAction] = useState<
+    WritebackAction | TableAction | null
+  >(editedAction || null);
   const isEditMode = !!editedAction;
 
   const [actionName, setActionName] = useState<string | undefined>(
@@ -167,8 +169,11 @@ export function RowActionSettingsModalContent({
                   )}
                   <Box className={S.ParametersListContainer}>
                     <RowActionParameterMappingForm
-                      action={selectedAction}
-                      parameters={writeableParameters}
+                      // TODO: Fix later when new table actions API is ready
+                      action={selectedAction as unknown as WritebackAction}
+                      parameters={
+                        writeableParameters as unknown as WritebackParameter[]
+                      }
                       values={values}
                       tableColumns={tableColumns}
                     />
