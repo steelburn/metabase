@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { t } from "ttag";
 
 import Link from "metabase/core/components/Link";
-import { RouterTablePicker } from "metabase/metadata/pages/DataModel/components";
+import { RouterTablePicker } from "metabase/metadata/components";
 import type { RouteParams } from "metabase/metadata/pages/DataModel/types";
 import { parseRouteParams } from "metabase/metadata/pages/DataModel/utils";
 import { Box, Flex, Icon, Stack } from "metabase/ui";
