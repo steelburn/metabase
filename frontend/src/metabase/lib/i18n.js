@@ -32,7 +32,14 @@ export async function loadLocalization(locale) {
             "": { Metabase: { msgid: "Metabase", msgstr: ["Metabase"] } },
           },
         };
-  setLocalization(translationsObject);
+
+  // eslint-disable-next-line no-undef
+  if (!process.env.IS_EMBEDDING_SDK) {
+    setLocalization(translationsObject);
+  } else {
+    // For SDK we MUST to lazily load a moment/dayjs locale to display a spinner while the locale is loading
+    await setLazyLocalization(translationsObject);
+  }
 
   return translationsObject;
 }
@@ -74,16 +81,69 @@ export function setLocalization(translationsObject) {
   }
 }
 
+export async function setLazyLocalization(translationsObject) {
+  const language = translationsObject.headers.language;
+  setLanguage(translationsObject);
+
+  await Promise.all([
+    updateLazyMomentLocale(language),
+    updateLazyDayjsLocale(language),
+  ]);
+
+  updateStartOfWeek(MetabaseSettings.get("start-of-week"));
+
+  if (ARABIC_LOCALES.includes(language)) {
+    preverseLatinNumbersInMomentLocale(language);
+  }
+}
+
 function updateMomentLocale(language) {
   const locale = getLocale(language);
 
-  try {
-    if (locale !== "en") {
-      require(`moment/locale/${locale}.js`);
+  // To avoid adding all locales to the bundling by SDK's host app bundlers
+  // SDK uses updateLazyMomentLocale
+  // eslint-disable-next-line no-undef
+  if (!process.env.IS_EMBEDDING_SDK) {
+    try {
+      if (locale !== "en") {
+        require(`moment/locale/${locale}.js`);
+      }
+      moment.locale(locale);
+    } catch {
+      console.warn(`Could not set moment.js locale to ${locale}`);
+      moment.locale("en");
     }
+  }
+}
+
+async function updateLazyMomentLocale(language) {
+  const locale = getLocale(language);
+
+  if (locale === "en") {
+    moment.locale("en");
+    return;
+  }
+
+  let isLocaleUpdated = false;
+
+  try {
+    // Try importing CJS locale first
+    await import(`moment/locale/${locale}.js`);
     moment.locale(locale);
-  } catch (e) {
-    console.warn(`Could not set moment.js locale to ${locale}`);
+    isLocaleUpdated = moment.locale() === locale;
+
+    if (!isLocaleUpdated) {
+      // Try importing ESM locale
+      await import(`moment/dist/locale/${locale}.js`);
+      moment.locale(locale);
+      isLocaleUpdated = moment.locale() === locale;
+    }
+
+    if (!isLocaleUpdated) {
+      throw new Error(`Could not detect moment locale format`);
+    }
+  } catch (err) {
+    console.warn(`Could not set moment.js locale to ${locale}`, err);
     moment.locale("en");
   }
 }
@@ -104,12 +164,31 @@ function preverseLatinNumbersInMomentLocale(locale) {
 function updateDayjsLocale(language) {
   const locale = getLocale(language);
 
+  // To avoid adding all locales to the bundling by SDK's host app bundlers
+  // SDK uses updateLazyDayjsLocale
+  // eslint-disable-next-line no-undef
+  if (!process.env.IS_EMBEDDING_SDK) {
+    try {
+      if (locale !== "en") {
+        require(`dayjs/locale/${locale}.js`);
+      }
+      dayjs.locale(locale);
+    } catch (e) {
+      console.warn(`Could not set day.js locale to ${locale}`);
+      dayjs.locale("en");
+    }
+  }
+}
+
+async function updateLazyDayjsLocale(language) {
+  const locale = getLocale(language);
+
   try {
     if (locale !== "en") {
-      require(`dayjs/locale/${locale}.js`);
+      await import(`dayjs/locale/${locale}.js`);
     }
     dayjs.locale(locale);
-  } catch (e) {
+  } catch {
     console.warn(`Could not set day.js locale to ${locale}`);
     dayjs.locale("en");
   }
