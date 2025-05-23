@@ -25,8 +25,6 @@ interface Props {
   params: RouteParams;
 }
 
-const DATA_MODEL_APP_NAV_BAR_HEIGHT = 53;
-
 export const DataModel = ({ params }: Props) => {
   const { databaseId, tableId, schemaId, fieldId } = parseRouteParams(params);
   const isEmptyStateShown =
@@ -48,7 +46,7 @@ export const DataModel = ({ params }: Props) => {
   const [previewType, setPreviewType] = usePreviewType();
 
   return (
-    <Flex h={`calc(100% - ${DATA_MODEL_APP_NAV_BAR_HEIGHT}px)`} bg="bg-light">
+    <Flex h="100%" bg="bg-light">
       <Stack
         className={S.sidebar}
         flex="0 0 25%"
