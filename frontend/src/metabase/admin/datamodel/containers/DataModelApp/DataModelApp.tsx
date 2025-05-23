@@ -1,3 +1,4 @@
+import cx from "classnames";
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 import { t } from "ttag";
@@ -11,9 +12,11 @@ import S from "./DataModelApp.module.css";
 
 export function DataModelApp({
   params,
+  location,
   children,
 }: {
   params: RouteParams;
+  location?: Location;
   children: ReactNode;
 }) {
   const { databaseId, tableId, schemaId } = parseRouteParams(params);
@@ -32,18 +35,28 @@ export function DataModelApp({
           tableId={tableId}
         />
         <Box mx="xl" py="sm" className={S.footer}>
-          <Link
-            to="/admin/datamodel/segments"
-            className={S.segmentsLink}
-            activeClassName={S.active}
-          >
-            <Icon name="pie" className={S.segmentsIcon} />
-            {t`Segments`}
-          </Link>
+          <SegmentsLink location={location} />
         </Box>
       </Stack>
 
       {children}
     </Flex>
+  );
+}
+
+function SegmentsLink({ location }: { location?: Location }) {
+  const isActive =
+    location?.pathname?.startsWith("/admin/datamodel/segments") ||
+    location?.pathname?.startsWith("/admin/datamodel/segment/");
+
+  return (
+    <Link
+      to="/admin/datamodel/segments"
+      className={cx(S.segmentsLink, { [S.active]: isActive })}
+      onlyActiveOnIndex={false}
+    >
+      <Icon name="pie" className={S.segmentsIcon} />
+      {t`Segments`}
+    </Link>
   );
 }
