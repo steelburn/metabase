@@ -713,8 +713,12 @@
 (api.macros/defendpoint :post "/:id/sync_schema"
   "Trigger a manual update of the schema metadata for this `Table`."
   [{:keys [id]} :- [:map
-                    [:id ms/PositiveInt]]]
-  (let [table (api/write-check (t2/select-one :model/Table :id id))]
+                    [:id ms/PositiveInt]]
+   {:keys [include_editable_data_model]}
+   :- [:map
+       [:include_editable_data_model {:optional true} [:maybe :boolean]]]]
+  (let [api-perm-check-fn (if include_editable_data_model api/write-check api/read-check)
+        table (api-perm-check-fn :model/Table id)]
     (events/publish-event! :event/table-manual-sync {:object table :user-id api/*current-user-id*})
     (let [database (table/database table)]
       ;; it's okay to allow testing H2 connections during sync. We only want to disallow you from testing them for the
