@@ -6,6 +6,10 @@ import { skipToken, useGetTableQueryMetadataQuery } from "metabase/api";
 import EmptyState from "metabase/components/EmptyState";
 import { LoadingAndErrorWrapper } from "metabase/components/LoadingAndErrorWrapper";
 import { getRawTableFieldId } from "metabase/metadata/utils/field";
+import {
+  type RouteParams,
+  parseRouteParams,
+} from "metabase/metadata/utils/route-params";
 import { PLUGIN_FEATURE_LEVEL_PERMISSIONS } from "metabase/plugins";
 import { Box, Flex } from "metabase/ui";
 
@@ -16,8 +20,6 @@ import {
   TableSection,
   usePreviewType,
 } from "./components";
-import type { RouteParams } from "./types";
-import { parseRouteParams } from "./utils";
 
 interface Props {
   params: RouteParams;

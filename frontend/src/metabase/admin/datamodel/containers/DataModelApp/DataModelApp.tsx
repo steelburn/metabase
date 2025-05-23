@@ -4,8 +4,10 @@ import { Link } from "react-router";
 import { t } from "ttag";
 
 import { RouterTablePicker } from "metabase/metadata/components";
-import type { RouteParams } from "metabase/metadata/pages/DataModel/types";
-import { parseRouteParams } from "metabase/metadata/pages/DataModel/utils";
+import {
+  type RouteParams,
+  parseRouteParams,
+} from "metabase/metadata/utils/route-params";
 import { Box, Flex, Icon, Stack } from "metabase/ui";
 
 import S from "./DataModelApp.module.css";
