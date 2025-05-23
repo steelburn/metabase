@@ -33,10 +33,7 @@ import CustomGeoJSONWidget from "../components/widgets/CustomGeoJSONWidget";
 import { NotificationSettings } from "../notifications/NotificationSettings";
 import SlackSettings from "../slack/containers/SlackSettings";
 
-import {
-  getAdminSettingDefinitions,
-  getAdminSettingWarnings,
-} from "./typed-selectors";
+import { getAdminSettingDefinitions } from "./typed-selectors";
 
 // This allows plugins to update the settings sections
 function updateSectionsWithPlugins(sections) {
@@ -265,16 +262,7 @@ export const getSectionsWithPlugins = _.once(() =>
   updateSectionsWithPlugins(ADMIN_SETTINGS_SECTIONS),
 );
 
-export const getSettings = createSelector(
-  getAdminSettingDefinitions,
-  getAdminSettingWarnings,
-  (settings, warnings) =>
-    settings.map((setting) =>
-      warnings[setting.key]
-        ? { ...setting, warning: warnings[setting.key] }
-        : setting,
-    ),
-);
+export const getSettings = getAdminSettingDefinitions;
 
 // getSettings selector returns settings for admin setting page and values specified by
 // environment variables set to "null". Actual applied setting values are coming from
