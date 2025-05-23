@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
+import { Link } from "react-router";
 import { t } from "ttag";
 
-import Link from "metabase/core/components/Link";
 import { RouterTablePicker } from "metabase/metadata/components";
 import type { RouteParams } from "metabase/metadata/pages/DataModel/types";
 import { parseRouteParams } from "metabase/metadata/pages/DataModel/utils";
@@ -32,7 +32,11 @@ export function DataModelApp({
           tableId={tableId}
         />
         <Box mx="xl" py="sm" className={S.footer}>
-          <Link to="/admin/datamodel/segments" className={S.segmentsLink}>
+          <Link
+            to="/admin/datamodel/segments"
+            className={S.segmentsLink}
+            activeClassName={S.active}
+          >
             <Icon name="pie" className={S.segmentsIcon} />
             {t`Segments`}
           </Link>

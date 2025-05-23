@@ -15,7 +15,8 @@
   cursor: pointer;
   padding: var(--mantine-spacing-sm);
 
-  &:hover {
+  &:hover,
+  &.active {
     background-color: var(--mb-color-brand-lighter);
     color: var(--mb-color-brand);
 
