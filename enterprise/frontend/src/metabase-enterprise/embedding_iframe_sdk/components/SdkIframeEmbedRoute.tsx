@@ -83,8 +83,21 @@ const SdkIframeEmbedView = ({
     )
     .with(
       {
+        questionId: P.nonNullable,
+        drillThroughEnabled: false,
+      },
+      (settings) => (
+        <StaticQuestion
+          questionId={settings.questionId}
+          height="100%"
+          initialSqlParameters={settings.initialSqlParameters}
+        />
+      ),
+    )
+    .with(
+      {
         dashboardId: P.nonNullable,
-        drillThroughEnabled: true,
+        drillThroughEnabled: P.optional(true),
       },
       (settings) => (
         <InteractiveDashboard
@@ -101,20 +114,7 @@ const SdkIframeEmbedView = ({
     .with(
       {
         questionId: P.nonNullable,
-        drillThroughEnabled: false,
-      },
-      (settings) => (
-        <StaticQuestion
-          questionId={settings.questionId}
-          height="100%"
-          initialSqlParameters={settings.initialSqlParameters}
-        />
-      ),
-    )
-    .with(
-      {
-        questionId: P.nonNullable,
-        drillThroughEnabled: true,
+        drillThroughEnabled: P.optional(true),
       },
       (settings) => (
         <InteractiveQuestion
