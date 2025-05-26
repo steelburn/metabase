@@ -14,10 +14,6 @@ const { H } = cy;
 describe("scenarios > admin > localization > content translation of column names", () => {
   describe("ee", () => {
     describe("after uploading related German translations", () => {
-      beforeEach(() => {
-        interceptContentTranslationRoutes();
-      });
-
       before(() => {
         H.restore();
         cy.signInAsAdmin();
@@ -34,6 +30,11 @@ describe("scenarios > admin > localization > content translation of column names
         );
         uploadTranslationDictionary(germanFieldNames);
         H.snapshot("translations-uploaded");
+      });
+
+      beforeEach(() => {
+        interceptContentTranslationRoutes();
+        H.restore("translations-uploaded" as any);
       });
 
       describe("on the question page", () => {
