@@ -67,6 +67,7 @@ import type {
   DashboardId,
   Database as DatabaseType,
   Dataset,
+  DatasetColumn,
   DatasetError,
   DatasetErrorType,
   Group,
@@ -757,6 +758,7 @@ export const PLUGIN_CONTENT_TRANSLATION = {
     obj: T,
     _tc: ContentTranslationFunction,
   ) => obj,
+  shouldTranslateFieldValuesOfColumn: (_col: DatasetColumn) => false,
 };
 
 export const PLUGIN_DB_ROUTING = {

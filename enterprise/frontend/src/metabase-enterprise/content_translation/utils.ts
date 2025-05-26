@@ -2,7 +2,7 @@ import * as I from "icepick";
 import _ from "underscore";
 
 import type { ContentTranslationFunction } from "metabase-lib";
-import type { DictionaryArray } from "metabase-types/api";
+import type { DatasetColumn, DictionaryArray } from "metabase-types/api";
 
 /** Translate a user-generated string
  *
@@ -65,3 +65,6 @@ export const translateDisplayNames = <T>(
   };
   return traverse(obj);
 };
+
+export const shouldTranslateFieldValuesOfColumn = (col: DatasetColumn) =>
+  col.semantic_type === "type/Category";

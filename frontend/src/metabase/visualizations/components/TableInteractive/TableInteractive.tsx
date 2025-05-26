@@ -75,6 +75,7 @@ import {
 import { MiniBarCell } from "./cells/MiniBarCell";
 import { useObjectDetail } from "./hooks/use-object-detail";
 import { useResetWidthsOnColumnsChange } from "./hooks/use-reset-widths-on-columns-change";
+import { PLUGIN_CONTENT_TRANSLATION } from "metabase/plugins";
 
 const getBodyCellVariant = (column: DatasetColumn): BodyCellVariant => {
   const isPill = isPK(column) || isFK(column);
@@ -240,7 +241,12 @@ export const TableInteractiveInner = forwardRef(function TableInteractiveInner(
       return memoize((value, rowIndex) => {
         const clicked = getCellClickedObject(columnIndex, rowIndex);
 
-        return formatValue(value, {
+        const maybeTranslatedValue =
+          PLUGIN_CONTENT_TRANSLATION.shouldTranslateFieldValuesOfColumn(col)
+            ? tc(value)
+            : value;
+
+        return formatValue(maybeTranslatedValue, {
           ...columnSettings,
           type: "cell",
           jsx: true,
@@ -249,7 +255,7 @@ export const TableInteractiveInner = forwardRef(function TableInteractiveInner(
         });
       });
     });
-  }, [cols, settings, getCellClickedObject]);
+  }, [cols, settings, getCellClickedObject, tc]);
 
   const handleBodyCellClick = useCallback(
     (
