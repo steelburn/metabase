@@ -9,9 +9,7 @@ import type { DictionaryArray } from "metabase-types/api";
  * Terminology: A "msgid" is a 'raw', untranslated string. A "msgstr" is a
  * translation of a msgid.
  * */
-export const translateContentString = <
-  MsgidType extends string | null | undefined,
->(
+export const translateContentString = <MsgidType = string | null | undefined>(
   dictionary: DictionaryArray | undefined,
   locale: string | undefined,
   /** This argument will be translated only if it is a string. If it is not a
