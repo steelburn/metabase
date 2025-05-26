@@ -107,6 +107,7 @@ const UploadForm = ({
           c("{0} is a number")
             .t`Upload a dictionary smaller than ${approxMaxFileSizeInMB} MB`,
         ]);
+        setStatus("rejected");
         return;
       }
 
