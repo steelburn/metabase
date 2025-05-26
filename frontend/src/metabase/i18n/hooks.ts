@@ -10,7 +10,7 @@ export const useTranslateContent = (): ContentTranslationFunction => {
 
 /** In EE, translate displayName fields in the object. Otherwise return the
  * object unchanged. */
-export const maybeTranslateDisplayNames = <T>(
+export const maybeTranslateDisplayNames = <T extends object>(
   obj: T,
   tc: ContentTranslationFunction,
 ) => {
