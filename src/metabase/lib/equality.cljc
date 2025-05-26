@@ -353,7 +353,9 @@
 
   Throws if there are multiple, ambiguous matches.
 
-  Returns the matching ref, or nil if no plausible matches are found."
+  Returns the matching ref, or nil if no plausible matches are found.
+
+  NOTE: Totally broken! Use [[find-matching-column]] instead."
   [column :- ::lib.schema.metadata/column
    refs   :- [:sequential ::lib.schema.ref/ref]]
   (let [ref-tails (group-by ref-id-or-name refs)
