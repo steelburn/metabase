@@ -484,10 +484,10 @@
                                  (when-let [source-field-id (when-not inherited-column?
                                                               (:fk-field-id metadata))]
                                    {:source-field source-field-id}))
-        id-or-name        (cond
-                            inherited-column? ((some-fn :lib/desired-column-alias :name) metadata)
-                            card-column? (:name metadata)
-                            :else ((some-fn :id :name) metadata))]
+        id-or-name        ((cond
+                             inherited-column? (some-fn :lib/desired-column-alias :name)
+                             card-column? :name
+                             :else (some-fn :id :name)) metadata)]
     [:field options id-or-name]))
 
 (defmethod lib.ref/ref-method :metadata/column
