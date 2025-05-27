@@ -6,7 +6,7 @@ import {
   uploadTranslationDictionary,
 } from "./helpers/e2e-content-translation-helpers";
 
-const { PRODUCTS_ID } = SAMPLE_DATABASE;
+const { PRODUCTS, PRODUCTS_ID } = SAMPLE_DATABASE;
 
 const { H } = cy;
 
@@ -19,25 +19,28 @@ describe("scenarios > content translation > dashboard filters and field values",
       cy.signInAsAdmin();
       H.setTokenFeatures("all");
 
-      H.createDashboardWithQuestions({
-        questions: [
+      H.createDashboardWithParameters(
+        {
+          name: "Products question",
+          query: {
+            "source-table": PRODUCTS_ID,
+          },
+        },
+        ["field", PRODUCTS.CATEGORY, null],
+        [
           {
-            name: "Products question",
-            query: {
-              "source-table": PRODUCTS_ID,
-            },
+            name: "Product category",
+            slug: "product_category",
+            id: "12345",
+            type: "string/=",
+            sectionId: "string",
+            isMultiSelect: false,
           },
         ],
-        cards: [{ col: 0, row: 0, size_x: 24, size_y: 6 }],
-      }).then(({ dashboard }) => {
-        cy.request("PUT", `/api/dashboard/${dashboard.id}`, {
-          // TODO: Remove this if not needed
-          // embedding_params: {
-          //   [dashboardFilter.slug]: "enabled",
-          // },
-          enable_embedding: true,
-        });
-        cy.wrap(dashboard.id).as("dashboardId");
+        { dashboardDetails: { enable_embedding: true } },
+        { visitDashboard: false },
+      ).then((dashboardId) => {
+        cy.wrap(dashboardId).as("dashboardId");
       });
 
       uploadTranslationDictionary(germanFieldNames);
@@ -62,7 +65,10 @@ describe("scenarios > content translation > dashboard filters and field values",
         cy.signInAsNormalUser();
         H.visitEmbeddedPage({
           resource: { dashboard: dashboardId },
-          params: {},
+          params: {
+            // TODO NEXT: Not sure how to get the parameter to display in embedding
+            product_category: "Doohickey",
+          },
         });
       });
     });
