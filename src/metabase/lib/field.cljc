@@ -620,12 +620,12 @@
 
 (defn- add-field-to-join [query stage-number column]
   (let [column-ref   (lib.ref/ref column)
-        [join field] (first (for [join  (lib.join/joins query stage-number)
-                                  :let [joinables (lib.join/joinable-columns query stage-number join)
-                                        field     (lib.equality/find-matching-column
-                                                   query stage-number column-ref joinables)]
-                                  :when field]
-                              [join field]))
+        [join joinables field] (first (for [join  (lib.join/joins query stage-number)
+                                            :let [joinables (lib.join/joinable-columns query stage-number join)
+                                                  field     (lib.equality/find-matching-column
+                                                             query stage-number column-ref joinables)]
+                                            :when field]
+                                        [join joinables field]))
         join-fields  (lib.join/join-fields join)]
 
     ;; Nothing to do if it's already selected, or if this join already has :fields :all.
@@ -633,7 +633,7 @@
     (if (or (= join-fields :all)
             (and field
                  (not= join-fields :none)
-                 (lib.equality/find-matching-column column-ref join-fields)))
+                 (find-matching-column-ref column-ref join-fields joinables)))
       query
       (lib.remove-replace/replace-join query stage-number join
                                        (lib.join/with-join-fields join
