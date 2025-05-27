@@ -227,7 +227,7 @@ describe("scenarios > question > joined questions", () => {
     H.queryBuilderMain().findByText("Sum Divide");
 
     cy.findByTestId("qb-filters-panel")
-      .findByText("Q2 - Product → ID is equal to 12")
+      .findByText("Q2 - Product → ID is 12")
       .should("be.visible");
   });
 
