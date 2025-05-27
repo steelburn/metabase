@@ -356,12 +356,12 @@
   Returns the matching ref, or nil if no plausible matches are found."
   [column :- ::lib.schema.metadata/column
    refs   :- [:sequential ::lib.schema.ref/ref]]
-  (let [ref-tails (group-by ref-id-or-name refs)
+  (let [ref-tails    (group-by ref-id-or-name refs)
         col-ref-tail (-> (lib.ref/ref column) ref-id-or-name)
-        matches   (or (some->> column :lib/source-uuid (get ref-tails) not-empty)
-                      (not-empty (get ref-tails (:id column)))
-                      (get ref-tails col-ref-tail)
-                      [])]
+        matches      (or (some->> column :lib/source-uuid (get ref-tails) not-empty)
+                         (not-empty (get ref-tails (:id column)))
+                         (get ref-tails col-ref-tail)
+                         [])]
     (case (count matches)
       0 nil
       1 (first matches)
