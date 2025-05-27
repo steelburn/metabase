@@ -1,14 +1,16 @@
 import { SAMPLE_DATABASE } from "e2e/support/cypress_sample_database";
+import type {
+  DashboardDetails,
+  StructuredQuestionDetails,
+} from "e2e/support/helpers";
 
 import { germanFieldNames, germanFieldValues } from "./constants";
 import {
   interceptContentTranslationRoutes,
   uploadTranslationDictionary,
 } from "./helpers/e2e-content-translation-helpers";
-import { StructuredQuestionDetails } from "e2e/support/helpers";
-import { DashboardDetails } from "../../performance/helpers/types";
 
-const { ORDERS, ORDERS_ID, PRODUCTS, PRODUCTS_ID } = SAMPLE_DATABASE;
+const { PRODUCTS, PRODUCTS_ID } = SAMPLE_DATABASE;
 
 const { H } = cy;
 

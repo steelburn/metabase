@@ -7,7 +7,6 @@ export { createQuestionAlert } from "./createNotification";
 export { createApiKey } from "./createApiKey";
 export { createCollection } from "./createCollection";
 export { createDashboard } from "./createDashboard";
-export { createDashboardWithParameters } from "./createDashboardWithParameters";
 export type { DashboardDetails } from "./createDashboard";
 export { createDashboardWithQuestions } from "./createDashboardWithQuestions";
 export { createDashboardWithTabs } from "./createDashboardWithTabs";
