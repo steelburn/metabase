@@ -112,7 +112,7 @@ describe("scenarios > dashboard > filters > reset & clear", () => {
   });
 
   it("temporal unit parameters", () => {
-    H.createDashboardWithParameters(
+    createDashboardWithParameters(
       ORDERS_COUNT_OVER_TIME,
       ORDERS_CREATED_AT_FIELD,
       [
@@ -767,6 +767,35 @@ describe("scenarios > dashboard > filters > reset all filters", () => {
     });
   });
 });
+
+function createDashboardWithParameters(
+  questionDetails: StructuredQuestionDetails,
+  targetField: LocalFieldReference,
+  parameters: DashboardDetails["parameters"],
+) {
+  H.createQuestionAndDashboard({
+    questionDetails,
+    dashboardDetails: {
+      parameters,
+    },
+  }).then(({ body: { dashboard_id }, questionId }) => {
+    H.updateDashboardCards({
+      dashboard_id,
+      cards: [
+        {
+          card_id: questionId,
+          parameter_mappings: parameters?.map((parameter) => ({
+            parameter_id: parameter.id,
+            card_id: questionId,
+            target: ["dimension", targetField],
+          })),
+        },
+      ],
+    });
+
+    H.visitDashboard(dashboard_id);
+  });
+}
 
 function checkStatusIcon(
   label: string,
