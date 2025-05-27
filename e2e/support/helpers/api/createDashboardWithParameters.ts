@@ -7,6 +7,8 @@ import type { StructuredQuestionDetails } from "./createQuestion";
 import { createQuestionAndDashboard } from "./createQuestionAndDashboard";
 import { updateDashboardCards } from "./updateDashboardCards";
 
+// TODO: Delete this file and revert the other file that refers to createDashboardWithParameters
+
 export function createDashboardWithParameters(
   questionDetails: StructuredQuestionDetails,
   targetField: LocalFieldReference,
