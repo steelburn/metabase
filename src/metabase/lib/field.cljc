@@ -593,11 +593,24 @@
   (cond-> query
     (not (:fields (lib.util/query-stage query stage-number))) (populate-fields-for-stage stage-number)))
 
+(defn- find-matching-column-ref
+  "Given a list of `columns` and their `refs`, find the ref from `refs` that matches the same column as `a-ref`."
+  [a-ref refs columns]
+  (let [matched-column (lib.equality/find-matching-column a-ref columns)]
+    (m/find-first #(= matched-column (lib.equality/find-matching-column % columns)) refs)))
+
+(defn- remove-matching-column-ref
+  "Given a list of `columns` and their `refs`, remove the ref from `refs` that matches the same column as `a-ref`."
+  [a-ref refs columns]
+  (let [matched-ref (find-matching-column-ref a-ref refs columns)]
+    (remove #(= % matched-ref) refs)))
+
 (defn- include-field [query stage-number column]
   (let [populated  (query-with-fields query stage-number)
         field-refs (fields populated stage-number)
-        match-ref  (lib.equality/find-matching-ref column field-refs)
-        column-ref (lib.ref/ref column)]
+        columns    (fieldable-columns query stage-number)
+        column-ref (lib.ref/ref column)
+        match-ref  (find-matching-column-ref column-ref field-refs columns)]
     (if (and match-ref
              (or (string? (last column-ref))
                  (integer? (last match-ref))))
@@ -669,22 +682,15 @@
         ;; Then drop any redundant :fields clauses.
         lib.remove-replace/normalize-fields-clauses)))
 
-(defn- remove-matching-ref
-  "Given a list of `columns` and their `refs`, remove the ref from `refs` that corresponds to `column`."
-  [column refs columns]
-  (let [column-ref (lib.ref/ref column)
-        matched-column (lib.equality/find-matching-column column-ref columns)
-        matched-ref (m/find-first #(= matched-column (lib.equality/find-matching-column % columns)) refs)]
-    (remove #(= % matched-ref) refs)))
-
 (defn- exclude-field
   "This is called only for fields that plausibly need removing. If the stage has no `:fields`, this will populate it.
   It shouldn't happen that we can't find the target field, but if that does happen, this will return the original query
   unchanged. (In particular, if `:fields` did not exist before it will still be omitted.)"
   [query stage-number column]
-  (let [columns  (fieldable-columns query stage-number)
-        old-refs (-> (query-with-fields query stage-number) (lib.util/query-stage stage-number) :fields)
-        new-refs (remove-matching-ref column old-refs columns)]
+  (let [columns   (fieldable-columns query stage-number)
+        column-ref (lib.ref/ref column)
+        old-refs   (-> (query-with-fields query stage-number) (lib.util/query-stage stage-number) :fields)
+        new-refs   (remove-matching-column-ref column-ref old-refs columns)]
     (cond-> query
       ;; If we couldn't find the field, return the original query unchanged.
       (< (count new-refs) (count old-refs)) (lib.util/update-query-stage stage-number assoc :fields new-refs))))
@@ -697,8 +703,9 @@
       ;; Nothing to do if there's already no join fields.
       query
       (let [join-columns (lib.metadata.calculation/returned-columns query stage-number join)
+            column-ref   (lib.ref/ref column)
             old-refs     (if (= join-fields :all) (map lib.ref/ref join-columns) join-fields)
-            new-refs     (remove-matching-ref column old-refs join-columns)]
+            new-refs     (remove-matching-column-ref column-ref old-refs join-columns)]
         (cond-> query
           ;; If we actually removed a field, replace the join. Otherwise return the query unchanged.
           (< (count new-refs) (count old-refs))
