@@ -185,6 +185,7 @@ export function BasicAdminSettingInput({
           onChange={(e) => handleChange(e.target.checked)}
           label={switchLabel ?? (localValue ? t`Enabled` : t`Disabled`)}
           w="auto"
+          size="sm"
           disabled={disabled}
         />
       );
@@ -281,8 +282,8 @@ export function SetByEnvVarWrapper<SettingName extends SettingKey>({
 }: SetByEnvVarWrapperProps<SettingName>) {
   if (
     settingDetails &&
-    settingDetails.is_env_setting &&
-    settingDetails.env_name
+    settingDetails?.is_env_setting &&
+    settingDetails?.env_name
   ) {
     return (
       <Box mb="lg">
